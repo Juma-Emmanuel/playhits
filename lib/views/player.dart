@@ -4,7 +4,6 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:playhits/consts/colors.dart';
 import 'package:playhits/consts/text_style.dart';
 import 'package:playhits/controller/player_controller.dart';
-import 'package:playhits/song.dart';
 
 class Player extends StatelessWidget {
   final List<SongModel> data;
@@ -15,7 +14,10 @@ class Player extends StatelessWidget {
     var controller = Get.find<PlayerController>();
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: bgDarkColor,
+        iconTheme: IconThemeData(color: whiteColor),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
@@ -62,8 +64,8 @@ class Player extends StatelessWidget {
                           data[controller.playIndex.value].displayNameWOExt,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: textStyles(size: 24, color: bgDarkColor),
+                          maxLines: 1,
+                          style: textStyles(size: 20, color: bgDarkColor),
                         ),
                         const SizedBox(
                           height: 12,
@@ -72,8 +74,8 @@ class Player extends StatelessWidget {
                           data[controller.playIndex.value].artist.toString(),
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: textStyles(size: 24, color: bgDarkColor),
+                          maxLines: 1,
+                          style: textStyles(size: 20, color: bgDarkColor),
                         ),
                         const SizedBox(
                           height: 12,
