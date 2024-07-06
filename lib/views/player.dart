@@ -4,11 +4,12 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:playhits/consts/colors.dart';
 import 'package:playhits/consts/text_style.dart';
 import 'package:playhits/controller/player_controller.dart';
+import 'package:get/get.dart';
 
 class Player extends StatelessWidget {
   final List<SongModel> data;
-  const Player({super.key, required this.data});
-
+  Player({super.key, required this.data});
+  final PlayerController controller = Get.find<PlayerController>();
   @override
   Widget build(BuildContext context) {
     var controller = Get.find<PlayerController>();
@@ -61,7 +62,9 @@ class Player extends StatelessWidget {
                     () => Column(
                       children: [
                         Text(
-                          data[controller.playIndex.value].displayNameWOExt,
+                          controller.songList[controller.playIndex.value]
+                              .displayNameWOExt,
+                          // data[controller.playIndex.value].displayNameWOExt,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -71,6 +74,7 @@ class Player extends StatelessWidget {
                           height: 12,
                         ),
                         Text(
+                          // controller.songList[controller.playIndex.value]
                           data[controller.playIndex.value].artist.toString(),
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
