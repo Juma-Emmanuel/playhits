@@ -5,3 +5,11 @@ const whiteColor = Color(0xffFFFFFF);
 const sliderColor = Color(0xff7E70FF);
 const buttonColor = Color(0xff60E95D);
 const bgDarkColor = Color(0xff070B11);
+
+double screenHeight(BuildContext context) {
+  return MediaQuery.of(context).size.height;
+}
+
+double screenWidth(BuildContext context) {
+  return MediaQuery.of(context).size.width;
+}

@@ -74,8 +74,9 @@ class Player extends StatelessWidget {
                           height: 12,
                         ),
                         Text(
-                          // controller.songList[controller.playIndex.value]
-                          data[controller.playIndex.value].artist.toString(),
+                          controller.songList[controller.playIndex.value].artist
+                              .toString(),
+                          // data[controller.playIndex.value].artist.toString(),
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,

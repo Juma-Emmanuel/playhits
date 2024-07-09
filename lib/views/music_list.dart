@@ -17,7 +17,7 @@ class MusicList extends StatefulWidget {
 
 class _MusicListState extends State<MusicList> {
   var controller = Get.put(PlayerController());
-  bool _permissionsGranted = false;
+  bool _permissionsGranted = true;
 
   @override
   void initState() {
@@ -70,43 +70,14 @@ class _MusicListState extends State<MusicList> {
                       ),
                     );
                   } else {
-                    controller.setPlaylistFromQuery(snapshot.data!);
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      controller.setPlaylistFromQuery(snapshot.data!);
+                      controller.updateSongList(snapshot.data!);
+                    });
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          InkWell(
-                            onTap: () {
-                              controller.playAll();
-                            },
-                            child: Container(
-                              width: screenWidth * 0.4,
-                              height: screenWidth * 0.11,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Play All",
-                                    style: TextStyle(
-                                        color: Color(0xFF30314D),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Icons.play_arrow_rounded,
-                                    color: Color(0xFF30314D),
-                                    size: 40,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
                           Expanded(
                             child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
@@ -135,18 +106,21 @@ class _MusicListState extends State<MusicList> {
                                     leading: QueryArtworkWidget(
                                       id: song.id,
                                       type: ArtworkType.AUDIO,
-                                      nullArtworkWidget: const Icon(
-                                          Icons.music_note,
-                                          color: whiteColor,
-                                          size: 32),
+                                      nullArtworkWidget: Container(
+                                        height: 35,
+                                        width: 35,
+                                        clipBehavior:
+                                            Clip.antiAliasWithSaveLayer,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.music_note,
+                                            color: Colors.purple, size: 32),
+                                      ),
                                     ),
                                     onTap: () {
-                                      controller.playSong(
-                                          snapshot.data![index].uri, index);
-                                      // controller.playSongFromPlaylist(index);
-                                      // Get.to(() => Player(data: snapshot.data!));
-                                      Get.to(() =>
-                                          MusicPlayer(data: snapshot.data!));
+                                      controller.playSongFromPlaylist(index);
                                     },
                                   ),
                                 );

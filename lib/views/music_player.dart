@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:marquee/marquee.dart';
+import 'package:playhits/consts/colors.dart';
 import 'package:playhits/controller/player_controller.dart';
 
 class MusicPlayer extends StatelessWidget {
-  const MusicPlayer({super.key, required this.data});
-  final List<SongModel> data;
+  MusicPlayer({
+    super.key,
+  });
+
+  final PlayerController controller = Get.find<PlayerController>();
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenheight = MediaQuery.of(context).size.height;
     var controller = Get.find<PlayerController>();
     return Container(
       decoration: const BoxDecoration(
@@ -36,8 +38,8 @@ class MusicPlayer extends StatelessWidget {
                   const Color(0xFF31314F).withOpacity(1)
                 ])),
             child: Container(
-              width: screenWidth,
-              height: screenheight,
+              width: screenWidth(context),
+              height: screenHeight(context),
               child: Column(children: [
                 Padding(
                   padding:
@@ -75,25 +77,41 @@ class MusicPlayer extends StatelessWidget {
                           children: [
                             Obx(
                               () => Container(
-                                width: screenWidth * 0.75,
+                                width: screenWidth(context) * 0.75,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      data[controller.playIndex.value]
-                                          .displayNameWOExt,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                          color: Colors.white.withOpacity(0.9),
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold),
+                                    Container(
+                                      width: screenWidth(context) * 0.75,
+                                      height: 50,
+                                      child: Marquee(
+                                        text: controller
+                                            .songList[
+                                                controller.playIndex.value]
+                                            .displayNameWOExt,
+                                        style: TextStyle(
+                                            color:
+                                                Colors.white.withOpacity(0.9),
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold),
+                                        scrollAxis: Axis.horizontal,
+                                        blankSpace: 20.0,
+                                        velocity: 50.0,
+                                        startPadding: 10.0,
+                                        accelerationDuration:
+                                            const Duration(seconds: 1),
+                                        accelerationCurve: Curves.linear,
+                                        decelerationDuration:
+                                            const Duration(milliseconds: 500),
+                                        decelerationCurve: Curves.easeOut,
+                                      ),
                                     ),
                                     const SizedBox(
                                       height: 10,
                                     ),
                                     Text(
-                                      data[controller.playIndex.value]
+                                      controller
+                                          .songList[controller.playIndex.value]
                                           .artist
                                           .toString(),
                                       overflow: TextOverflow.ellipsis,
@@ -108,7 +126,9 @@ class MusicPlayer extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  controller.shufflePlaylist();
+                                },
                                 icon: const Icon(
                                   Icons.favorite,
                                   color: Colors.redAccent,
@@ -121,16 +141,12 @@ class MusicPlayer extends StatelessWidget {
                         () => Column(
                           children: [
                             Slider(
-                              min: 0 // const Duration(seconds: 0)
-                              //     .inSeconds
-                              //     .toDouble()
-                              ,
+                              min: 0,
                               max: controller.max.value,
                               value: controller.value.value,
                               onChanged: (newValue) {
                                 controller
                                     .changeDurationToSeconds(newValue.toInt());
-                                // newValue = newValue;
                               },
                               activeColor: Colors.white,
                               inactiveColor: Colors.white54,
@@ -172,16 +188,7 @@ class MusicPlayer extends StatelessWidget {
                           children: [
                             IconButton(
                                 onPressed: () {
-                                  if (controller.playIndex.value == 0) {
-                                    controller.playSong(
-                                        data[data.length - 1].uri,
-                                        data.length - 1);
-                                  } else {
-                                    controller.playSong(
-                                        data[controller.playIndex.value - 1]
-                                            .uri,
-                                        controller.playIndex.value - 1);
-                                  }
+                                  controller.skipToPrevious();
                                 },
                                 icon: const Icon(
                                   CupertinoIcons.backward_end_fill,
@@ -197,11 +204,9 @@ class MusicPlayer extends StatelessWidget {
                                   child: IconButton(
                                       onPressed: () {
                                         if (controller.isPlaying.value) {
-                                          controller.audioPlayer.pause();
-                                          controller.isPlaying(false);
+                                          controller.pauseSong();
                                         } else {
-                                          controller.audioPlayer.play();
-                                          controller.isPlaying(true);
+                                          controller.resumeSong();
                                         }
                                       },
                                       icon: controller.isPlaying.value
@@ -224,15 +229,7 @@ class MusicPlayer extends StatelessWidget {
                             ),
                             IconButton(
                                 onPressed: () {
-                                  if (controller.playIndex.value + 1 ==
-                                      data.length) {
-                                    controller.playSong(data[0].uri, 0);
-                                  } else {
-                                    controller.playSong(
-                                        data[controller.playIndex.value + 1]
-                                            .uri,
-                                        controller.playIndex.value + 1);
-                                  }
+                                  controller.skipToNext();
                                 },
                                 icon: const Icon(
                                   CupertinoIcons.forward_end_fill,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:playhits/lists/playlist_tracks.dart';
+import 'package:playhits/widgets/bottom_music_player.dart';
 import 'package:playhits/widgets/playlist_listtile.dart';
 
 class PLaylistView extends StatefulWidget {
@@ -15,7 +16,6 @@ class _PLaylistViewState extends State<PLaylistView> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      // width: screenWidth,
       decoration: BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -125,7 +125,7 @@ class _PLaylistViewState extends State<PLaylistView> {
                     width: screenWidth * 0.4,
                     height: screenWidth * 0.11,
                     decoration: BoxDecoration(
-                        color: Color(0xFF30314D),
+                        color: const Color(0xFF30314D),
                         borderRadius: BorderRadius.circular(8)),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -157,6 +157,7 @@ class _PLaylistViewState extends State<PLaylistView> {
             const PlaylistTracks(),
           ],
         )),
+        bottomNavigationBar: const BottomMusicPlayerWidget(),
       ),
     );
   }

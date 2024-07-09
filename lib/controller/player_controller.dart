@@ -8,6 +8,7 @@ class PlayerController extends GetxController {
   final audioPlayer = AudioPlayer();
   var playIndex = 0.obs;
   var isPlaying = false.obs;
+  var isPaused = false.obs;
   // var duration = ''.obs;
   // var position = ''.obs;
   final RxString position = "00:00".obs;
@@ -74,14 +75,39 @@ class PlayerController extends GetxController {
   }
 
   void skipToNext() {
-    audioPlayer.seekToNext();
+    if (playIndex.value + 1 < songList.length) {
+      playSongFromPlaylist(playIndex.value + 1);
+    } else {
+      playSongFromPlaylist(0);
+    }
+  }
+
+  void pauseSong() {
+    audioPlayer.pause();
+    isPlaying.value = false;
+    isPaused.value = true;
+  }
+
+  void resumeSong() {
+    audioPlayer.play();
+    isPlaying.value = true;
+    isPaused.value = false;
+  }
+
+  void stopSong() {
+    audioPlayer.stop();
+    isPlaying.value = false;
   }
 
   void skipToPrevious() {
-    audioPlayer.seekToPrevious();
+    if (playIndex.value > 0) {
+      playSongFromPlaylist(playIndex.value - 1);
+    } else {
+      playSongFromPlaylist(songList.length - 1);
+    }
   }
 
-  Future<void> playSongFromPlaylist(int index) async {
+  Future<void> playSongFromPlaylist1(int index) async {
     if (index >= 0 && index < playlist.length) {
       playIndex.value = index;
       try {
@@ -91,9 +117,29 @@ class PlayerController extends GetxController {
         );
         audioPlayer.play();
         isPlaying(true);
+        isPaused.value = false;
         updatePosition();
       } on Exception catch (e) {
-        print("hello");
+        debugPrint(e.toString());
+      }
+    }
+  }
+
+  Future<void> playSongFromPlaylist(int index) async {
+    if (index >= 0 && index < songList.length) {
+      playIndex.value = index;
+      try {
+        final audioSources = songList
+            .map((song) => AudioSource.uri(Uri.parse(song.uri!)))
+            .toList();
+        await audioPlayer.setAudioSource(
+          ConcatenatingAudioSource(children: audioSources),
+          initialIndex: index,
+        );
+        audioPlayer.play();
+        isPlaying(true);
+        isPaused.value = false;
+      } on Exception catch (e) {
         debugPrint(e.toString());
       }
     }
@@ -105,6 +151,7 @@ class PlayerController extends GetxController {
       audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(uri!)));
       audioPlayer.play();
       isPlaying(true);
+      isPaused(false);
       updatePosition();
     } on Exception catch (e) {
       debugPrint(e.toString());
@@ -125,6 +172,7 @@ class PlayerController extends GetxController {
       audioPlayer.setAudioSource(ConcatenatingAudioSource(children: playlist));
       audioPlayer.play();
       isPlaying(true);
+      isPaused(false);
       updatePosition();
     } on Exception catch (e) {
       debugPrint(e.toString());
@@ -136,23 +184,16 @@ class PlayerController extends GetxController {
     final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
-  // Future<void> setPlaylistFromQuery() async {
-  //   List<SongModel> songs = await audioQuery.querySongs(
-  //     ignoreCase: true,
-  //     orderType: OrderType.ASC_OR_SMALLER,
-  //     sortType: null,
-  //     uriType: UriType.EXTERNAL,
-  //   );
 
-  //   playlist.clear();
-  //   for (var song in songs) {
-  //     playlist.add(AudioSource.uri(Uri.parse(song.uri!)));
-  //   }
-  // }
   Future<void> setPlaylistFromQuery(List<SongModel> songs) async {
     playlist.clear();
     for (var song in songs) {
       playlist.add(AudioSource.uri(Uri.parse(song.uri!)));
     }
+  }
+
+  void updateSongList(List<SongModel> songs) {
+    songList.clear();
+    songList.addAll(songs);
   }
 }
